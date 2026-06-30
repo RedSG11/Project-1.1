@@ -45,11 +45,11 @@ if f is not None:
   content = f.read()
   st.success("Uploaded")
   st.write(content)
-if "messages" not in st.session_state:
+if "messages" not in st.session_state: #Khi vừa chạy session, ko có "messages" nên tạo list tin nhắn trống
   st.session_state.messages = []
-prompt = st.chat_input("Ask")
+prompt = st.chat_input("Ask") #Chat input
 if prompt: 
-  st.session_state.messages.append({"role" : "user", "content" : prompt})
+  st.session_state.messages.append({"role" : "user", "content" : prompt}) #Sau khi input, thêm 1 tin nhắn vào list tin nhắn
 for m in st.session_state.messages:
-  with st.chat_message(m["role"]):
+  with st.chat_message(m["role"]): #Cứ 1 tin nhắn trong list, tạo khung chat và viết content
     st.write(m["content"])

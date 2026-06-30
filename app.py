@@ -15,3 +15,6 @@ with st.echo():
   def average(list): 
     return sum(list)/len(list)
   st.write(average([1, 2, 3, 4]))
+st.logo("Agrisoil Nexus Logo - Emblem Style, Modern Minimalist.png")
+st.image("Agrisoil Nexus Logo - Emblem Style, Modern Minimalist.png", caption = "image")
+

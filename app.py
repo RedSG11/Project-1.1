@@ -53,3 +53,9 @@ if prompt:
 for m in st.session_state.messages:
   with st.chat_message(m["role"]): #Cứ 1 tin nhắn trong list, tạo khung chat và viết content
     st.write(m["content"])
+with st.form("nlp form"):
+  st.text_area("Text")
+  task = st.selectbox("Task", ["Sentiment", "Summarization", "Q&A"])
+  ok = st.form_submit_button("Submit")
+if ok:
+  st.write(task)

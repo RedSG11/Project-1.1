@@ -28,3 +28,6 @@ if st.button("Run"):
   st.write("Task: ", task)
   st.write("Threshold: ", thr)
   st.write("In language", language)
+st.badge("Approved", color = "green")
+st.badge("Reviewing", color = "yellow")
+st.markdown(":red-badge[Declined]")

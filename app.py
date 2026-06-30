@@ -64,3 +64,10 @@ if "count" not in st.session_state:
 if st.button("Increment"):
   st.session_state.count += 1
 st.write("Value: ", st.session_state.count)
+count1 = 0  
+
+if st.button("Increment"):
+    count1 += 1 # 2. It becomes 1
+
+# 3. It prints "Value: 1"
+st.write("Value:", count1)

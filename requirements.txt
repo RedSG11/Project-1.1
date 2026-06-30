@@ -4,3 +4,4 @@ nltk
 pyspellchecker
 langcodes
 deep-translator
+language_data

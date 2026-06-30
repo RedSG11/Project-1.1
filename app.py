@@ -1,7 +1,4 @@
-# ==============================================================
-#  Streamlit NLP Pipeline Demo — v2 (2 ứng dụng)
-#  App 1: Dịch văn bản  ·  App 2: Sửa lỗi chính tả
-# ==============================================================
+#------Libraries------
 import langcodes
 import streamlit as st
 from deep_translator import GoogleTranslator
@@ -9,8 +6,9 @@ from langdetect import DetectorFactory, LangDetectException, detect
 from nltk.tokenize import TreebankWordDetokenizer, wordpunct_tokenize
 from spellchecker import SpellChecker
 
+#------Support Lists------
 DetectorFactory.seed = 0
-MIN_INPUT_LENGTH = 3
+min_input_length = 3
 
 # pyspellchecker chỉ hỗ trợ một số ngôn ngữ
 SPELL_LANGS = {"en", "es", "fr", "pt", "de", "ru", "ar", "eu", "lv", "nl"}
@@ -38,131 +36,116 @@ EXAMPLES_S = [
     "Je voudraiis allerr au marchee.",
 ]
 
-
-# ---------------- Helpers ----------------
+#------Support Functions------
 @st.cache_resource(show_spinner=False)
-def get_spellchecker(code):
-    return SpellChecker(language=code)
 
+def get_spellchecker(lang_code): #Function to load spellchecker model
+    return SpellChecker(language=lang_code)
 
-def language_name(code):
+def language_name(lang_code): #Function to translate lang_code (en, vi) to lang_name (English, Vietnamese)
     try:
-        return langcodes.Language.get(code).display_name()
+        return langcodes.Language.get(lang_code).display_name()
     except Exception:
-        return code or "Unknown"
+        return lang_code or "Unknown"
 
-
-def detect_language(raw):
+def detect_language(raw): #Function to detect the language of raw texts
     try:
         return detect(raw)
     except LangDetectException:
         return None
-
-
-def fix_typos(text, code):
-    spell = get_spellchecker(code)
-    tokens = wordpunct_tokenize(text)
-    fixed = []
-    for token in tokens:
-        if token.isalpha() and len(token) > 1:
-            suggestion = spell.correction(token.lower()) or token
-            suggestion = suggestion.title() if token.istitle() else suggestion
-            suggestion = suggestion.upper() if token.isupper() else suggestion
+    
+def fix_typos(text, lang_code):
+    spell = get_spellchecker(lang_code) 
+    words = wordpunct_tokenize(text) #Split text into individual strings and add into a list called words
+    fixed = [] #Initialize an empty "fixed" list
+    for word in words: #Loop through the words list
+        if word.isalpha() and len(word) > 1: #Only fix typo if word is alphabetical and has more than 1 character
+            suggestion = spell.correction(word.lower()) or word #Load spellchecker and initialize suggestion
+            suggestion = suggestion.title() if word.istitle() else suggestion #If raw word is title, suggestion should be title
+            suggestion = suggestion.upper() if word.isupper() else suggestion
             fixed.append(suggestion)
         else:
-            fixed.append(token)
-    return TreebankWordDetokenizer().detokenize(fixed), fixed != tokens
+            fixed.append(word)
+    return TreebankWordDetokenizer().detokenize(fixed), fixed != tokens #Special function to reconnect word strings into sentences
 
-
-# ---------------- Pipelines ----------------
+#------Main Functions------
 def run_translation(text, target_code):
     raw = text.strip()
-    if len(raw) < MIN_INPUT_LENGTH:
-        return {"ok": False, "error": f"Nhập tối thiểu {MIN_INPUT_LENGTH} ký tự."}
-
+    if len(raw) < min_input_length:
+        return {"Ok": False, "Error": f'Please type at least {min_input_length} characters'}
     source = detect_language(raw)
-    if source is None:
-        return {"ok": False, "error": "Không nhận diện được ngôn ngữ."}
-
     if source == target_code:
         return {
             "ok": True,
             "source": language_name(source),
             "target": language_name(target_code),
             "translated": raw,
-            "note": "Câu đã ở ngôn ngữ đích, không cần dịch.",
+            "note": "Text has already been in target language" 
         }
-
+    if source is None:
+        return {
+            "ok": False,
+            "error" : "Cannot detect language"
+        }
     try:
         translated = GoogleTranslator(source=source, target=target_code).translate(raw)
     except Exception as e:
         return {"ok": False, "error": f"Lỗi dịch: {e}"}
-
     return {
         "ok": True,
         "source": language_name(source),
         "target": language_name(target_code),
-        "translated": translated,
+        "translated": translated
     }
 
-
-def run_spellcheck(text):
+def run_spellchecker(text):
     raw = text.strip()
-    if len(raw) < MIN_INPUT_LENGTH:
-        return {"ok": False, "error": f"Nhập tối thiểu {MIN_INPUT_LENGTH} ký tự."}
-
-    code = detect_language(raw)
-    if code is None:
-        return {"ok": False, "error": "Không nhận diện được ngôn ngữ."}
-
-    if code not in SPELL_LANGS:
+    if len(raw) < min_input_length:
+        return {"Ok": False, "Error": f'Please type at least {min_input_length} characters'}
+    lang = detect_language(text)
+    if lang is None: 
         return {
             "ok": False,
-            "error": f"pyspellchecker chưa hỗ trợ {language_name(code)} ({code}).",
+            "error" : "Cannot detect language"
         }
-
-    fixed, changed = fix_typos(raw, code)
+    if lang not in SPELL_LANGS:
+        return {
+            "ok": False,
+            "error": "Unsupported language"
+        }
+    fixed, changed = fix_typos(raw, lang)
     return {
         "ok": True,
-        "language": language_name(code),
+        "language": language_name(lang),
         "fixed": fixed,
         "changed": changed,
     }
 
-
-# ---------------- UI ----------------
+#------UI------
 st.set_page_config(page_title="NLP Pipeline Demo", layout="centered")
 st.title("Streamlit NLP Pipeline Demo")
-st.caption("Hai ứng dụng: Dịch văn bản · Sửa lỗi chính tả")
+st.caption("Two applications: Translator • Spelling Checker")
+tab_t, tab_s = st.tabs(["Translator", "Spelling Checker"])
 
-tab_t, tab_s = st.tabs(["Dịch văn bản", "Sửa lỗi chính tả"])
-
-
-# ===== Tab 1: Translation =====
+#------Tab 1: Translator------
 with tab_t:
     st.session_state.setdefault("res_t", None)
 
     with st.expander("Ví dụ"):
         for ex in EXAMPLES_T:
             st.markdown(f"- {ex}")
-
     with st.form("form_translate"):
-        text_t = st.text_area("Câu cần dịch", height=90,
-                              placeholder="Nhập câu ở bất kỳ ngôn ngữ nào...")
-        target = st.selectbox("Dịch sang", list(TARGET_LANGS.keys()))
-        submitted_t = st.form_submit_button("Dịch", type="primary")
-
+        text_t = st.text_area("Input", height = 90, placeholder="Type texts in any language")
+        target = st.selectbox("Translate to:", options = list(TARGET_LANGS.keys()))
+        submitted_t = st.form_submit_button("Translate", type = "primary")
     if submitted_t:
         st.session_state.res_t = run_translation(text_t, TARGET_LANGS[target])
-
     res = st.session_state.res_t
     if res:
-        if res["ok"]:
-            st.caption(f"Nguồn: {res['source']}  →  Đích: {res['target']}")
-            st.success(res["translated"])
-            if res.get("note"):
-                st.info(res["note"])
+        if res["ok"]: #If run_translation has returned "ok": True
+            st.caption(f'Source language: {TARGET_LANGS[res['source']]} -> Target language: {TARGET_LANGS[res['target']]}') #take 'source' and 'target' from run_translation
+            st.success(res['translated']) #take 'translated' from run_translation
+            if res.get("note"): #if there is 'note'
+                st.info(res["note"]) #take 'note' from run_translation
         else:
-            st.warning(res["error"])
-
-
+            st.warning(res['error'])

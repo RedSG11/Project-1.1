@@ -40,3 +40,8 @@ else:
 st.link_button("Open docs", "https://docs.streamlit.io")
 st.number_input("Max sentences", max_value = 100, min_value = 1, value = 50)
 st.slider("Range", 0.0, 100.0, (25.0, 75.0))
+f = st.file_uploader("Upload file", type = ["csv", "txt"])
+if f is not None:
+  content = f.read()
+  st.success("Uploaded")
+  st.write(content)

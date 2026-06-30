@@ -42,9 +42,11 @@ EXAMPLES_S = [
 def get_spellchecker(lang_code): #Function to load spellchecker model
     return SpellChecker(language=lang_code)
 
-def language_name(lang_code): #Function to translate lang_code (en, vi) to lang_name (English, Vietnamese)
+def language_name(lang_code): 
     try:
-        return langcodes.Language.get(lang_code).display_name()
+        # Thay thế dấu "-" thành "_" (Ví dụ: zh-CN -> zh_CN)
+        clean_code = lang_code.replace("-", "_") if lang_code else lang_code
+        return langcodes.Language.get(clean_code).display_name()
     except Exception:
         return lang_code or "Unknown"
 
@@ -143,7 +145,7 @@ with tab_t:
     res = st.session_state.res_t
     if res:
         if res["ok"]: #If run_translation has returned "ok": True
-            st.caption(f'Source language: {TARGET_LANGS.keys()[TARGET_LANGS.values().index(res['source'])]} -> Target language: {TARGET_LANGS.keys()[TARGET_LANGS.values().index(res['target'])]}') #take 'source' and 'target' from run_translation
+            st.caption(f'Source language: {res["source"]} -> Target language: {res["target"]}') #take 'source' and 'target' from run_translation
             st.success(res['translated']) #take 'translated' from run_translation
             if res.get("note"): #if there is 'note'
                 st.info(res["note"]) #take 'note' from run_translation

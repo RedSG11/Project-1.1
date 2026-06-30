@@ -74,7 +74,7 @@ def fix_typos(text, lang_code):
 def run_translation(text, target_code):
     raw = text.strip()
     if len(raw) < min_input_length:
-        return {"ok": False, "error": f'Please type at least {min_input_length} characters'}
+        return {"Ok": False, "Error": f'Please type at least {min_input_length} characters'}
     source = detect_language(raw)
     if source == target_code:
         return {
@@ -133,7 +133,7 @@ tab_t, tab_s = st.tabs(["Translator", "Spelling Checker"])
 with tab_t:
     st.session_state.setdefault("res_t", None)
 
-    with st.expander("Ví dụ"):
+    with st.expander("Example"):
         for ex in EXAMPLES_T:
             st.markdown(f"- {ex}")
     with st.form("form_translate"):
@@ -151,3 +151,25 @@ with tab_t:
                 st.info(res["note"]) #take 'note' from run_translation
         else:
             st.warning(res['error'])
+
+#------Tab 2: Spelling Checker------
+with tab_s:
+    st.session_state.setdefault("res_s", None)
+
+    with st.expander("Example"):
+        for ex in EXAMPLES_S:
+            st.markdown(f'- {ex}')
+    st.caption(f"Hỗ trợ: {', '.join(sorted(SPELL_LANGS))}")
+    with st.form("form_spellchecker"):
+        text_s = st.text_area("Input", height = 90, placeholder="Type texts in any language")
+        submitted_s = st.form_submit_button("Check", type = "primary")
+    if submitted_s:
+        st.session_state.res_s = run_spellchecker(text_s)
+    res = st.session_state.res_s
+    if res:
+        if res["ok"]:
+            st.caption(f'Language: {res['language']}')
+            st.success(res["fixed"])
+            st.caption("Spelling error fixed" if res["changed"] else "No error detected")
+        else:
+            st.warning(res["error"])

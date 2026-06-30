@@ -14,4 +14,4 @@ st.code("def average(list): return sum(list)/len(list)", language = "python")
 with st.echo():
   def average(list): 
     return sum(list)/len(list)
-  print(average([1, 2, 3, 4]))
+  st.write(average([1, 2, 3, 4]))

@@ -1,4 +1,3 @@
-%%writefile app.py
 # ==============================================================
 #  Streamlit NLP Pipeline Demo — v2 (2 ứng dụng)
 #  App 1: Dịch văn bản  ·  App 2: Sửa lỗi chính tả
@@ -154,41 +153,16 @@ with tab_t:
         submitted_t = st.form_submit_button("Dịch", type="primary")
 
     if submitted_t:
-        ***Your Code Here***.res_t = run_translation(text_t, TARGET_LANGS[target])
+        st.session_state.res_t = run_translation(text_t, TARGET_LANGS[target])
 
     res = st.session_state.res_t
     if res:
         if res["ok"]:
             st.caption(f"Nguồn: {res['source']}  →  Đích: {res['target']}")
-            ***Your Code Here***(res["translated"])
+            st.success(res["translated"])
             if res.get("note"):
                 st.info(res["note"])
         else:
             st.warning(res["error"])
 
 
-# ===== Tab 2: Spell check =====
-with tab_s:
-    st.session_state.setdefault("res_s", None)
-
-    with st.expander("Ví dụ"):
-        for ex in EXAMPLES_S:
-            st.markdown(f"- {ex}")
-    st.caption(f"Hỗ trợ: {', '.join(sorted(SPELL_LANGS))}")
-
-    with st.form("form_spell"):
-        text_s = st.text_area("Câu cần kiểm tra", height=90,
-                              placeholder="Nhập câu để kiểm tra chính tả...")
-        submitted_s = st.form_submit_button("Kiểm tra", type="primary")
-
-    if submitted_s:
-        ***Your Code Here***.res_s = run_spellcheck(text_s)
-
-    res = st.session_state.res_s
-    if res:
-        if res["ok"]:
-            ***Your Code Here***(f"Ngôn ngữ: {res['language']}")
-            ***Your Code Here***(res["fixed"])
-            st.caption("Có sửa lỗi chính tả" if res["changed"] else "Không phát hiện lỗi")
-        else:
-            ***Your Code Here***(res["error"])

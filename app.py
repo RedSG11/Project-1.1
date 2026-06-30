@@ -31,3 +31,5 @@ if st.button("Run"):
 st.badge("Approved", color = "green")
 st.badge("Reviewing", color = "yellow")
 st.markdown(":red-badge[Declined]")
+opts = st.multiselect("Select", ["VN", "EN", "FR", "JP", "KR"])
+lvl = st.select_slide("Select", ["Low", "Medium", "High"])

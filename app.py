@@ -17,4 +17,10 @@ with st.echo():
   st.write(average([1, 2, 3, 4]))
 st.logo("Agrisoil Nexus Logo - Emblem Style, Modern Minimalist.png")
 st.image("Agrisoil Nexus Logo - Emblem Style, Modern Minimalist.png", caption = "image")
-
+task = st.selectbox("Task", ["Sentiment", "Summarisation", "Q&A"])
+thr = st.slider("Threshold", 0.0, 1.0, 1.5)
+lang = st.radio("Language", ["VN", "EN"])
+if st.button("Run"):
+  st.write("Task: ", task)
+  st.write("Threshold: ", thr)
+  st.write("In language", if lang = "VN": "Vietnamese" else "English")

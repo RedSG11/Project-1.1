@@ -20,7 +20,11 @@ st.image("Agrisoil Nexus Logo - Emblem Style, Modern Minimalist.png", caption = 
 task = st.selectbox("Task", ["Sentiment", "Summarisation", "Q&A"])
 thr = st.slider("Threshold", 0.0, 1.0, 1.5)
 lang = st.radio("Language", ["VN", "EN"])
+if lang = "VN":
+  language = "Vietnamese"
+else:
+  language = "English"
 if st.button("Run"):
   st.write("Task: ", task)
   st.write("Threshold: ", thr)
-  st.write("In language", if lang = "VN": "Vietnamese" else "English")
+  st.write("In language", language)

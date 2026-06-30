@@ -143,7 +143,7 @@ with tab_t:
     res = st.session_state.res_t
     if res:
         if res["ok"]: #If run_translation has returned "ok": True
-            st.caption(f'Source language: {TARGET_LANGS[res['source']]} -> Target language: {TARGET_LANGS[res['target']]}') #take 'source' and 'target' from run_translation
+            st.caption(f'Source language: {TARGET_LANGS.get(res['source'])} -> Target language: {TARGET_LANGS.get(res['target'])}') #take 'source' and 'target' from run_translation
             st.success(res['translated']) #take 'translated' from run_translation
             if res.get("note"): #if there is 'note'
                 st.info(res["note"]) #take 'note' from run_translation

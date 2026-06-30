@@ -1,4 +1,6 @@
 streamlit
-matplotlib
-pandas
-openpyxl
+langdetect
+nltk
+pyspellchecker
+langcodes
+deep-translator

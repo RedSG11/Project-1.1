@@ -1,68 +1,35 @@
-import matplotlib.pyplot as plt
-import pandas as pd
+import langcodes
 import streamlit as st
-import io 
-from PIL import Image 
-st.title("Title")
-st.header("Header")
-st.subheader("Subheader")
-st.text("Normal text")
-st.markdown("**Bold** and *Italic*")
-st.latex(r"P(A | B) = \frac{P(B | A) * P(A)}{P(B)}")
-st.write("write")
-st.code("def average(list): return sum(list)/len(list)", language = "python")
-with st.echo():
-  def average(list): 
-    return sum(list)/len(list)
-  st.write(average([1, 2, 3, 4]))
-st.logo("Agrisoil Nexus Logo - Emblem Style, Modern Minimalist.png")
-st.image("Agrisoil Nexus Logo - Emblem Style, Modern Minimalist.png", caption = "image")
-task = st.selectbox("Task", ["Sentiment", "Summarisation", "Q&A"])
-thr = st.slider("Threshold", 0.0, 1.0, 1.5)
-lang = st.radio("Language", ["VN", "EN"])
-if lang == "VN":
-  language = "Vietnamese"
-else:
-  language = "English"
-if st.button("Run"):
-  st.write("Task: ", task)
-  st.write("Threshold: ", thr)
-  st.write("In language", language)
-st.badge("Approved", color = "green")
-st.badge("Reviewing", color = "yellow")
-st.markdown(":red-badge[Declined]")
-opts = st.multiselect("Select", ["VN", "EN", "FR", "JP", "KR"])
-lvl = st.select_slider("Select", ["Low", "Medium", "High"])
-if st.button("Say hello"):
-  st.write("Hello")
-else: 
-  st.write("Goodbye")
-st.link_button("Open docs", "https://docs.streamlit.io")
-st.number_input("Max sentences", max_value = 100, min_value = 1, value = 50)
-st.slider("Range", 0.0, 100.0, (25.0, 75.0))
-f = st.file_uploader("Upload file", type = ["csv", "txt"])
-if f is not None:
-  content = f.read()
-  st.success("Uploaded")
-  st.write(content)
-if "messages" not in st.session_state: #Khi vừa chạy session, ko có "messages" nên tạo list tin nhắn trống
-  st.session_state.messages = []
-prompt = st.chat_input("Ask") #Chat input
-if prompt: 
-  st.session_state.messages.append({"role" : "user", "content" : prompt}) #Sau khi input, thêm 1 tin nhắn vào list tin nhắn
-for m in st.session_state.messages:
-  with st.chat_message(m["role"]): #Cứ 1 tin nhắn trong list, tạo khung chat và viết content
-    st.write(m["content"])
-with st.form("nlp form"):
-  st.text_area("Text")
-  task = st.selectbox("Task", ["Sentiment", "Summarization", "Q&A"])
-  ok = st.form_submit_button("Submit")
-if ok:
-  st.write(task)
-count1 = 0  
+from deep_translator import GoogleTranslator
+from langdetect import DetectorFactory, LangDetectException, detect
+from nltk.tokenize import TreebankWordDetokenizer, wordpunct_tokenize
+from spellchecker import SpellChecker
 
-if st.button("Increment"):
-    count1 += 1 # 2. It becomes 1
+DetectorFactory.seed = 0
+MIN_INPUT_LENGTH = 3
 
-# 3. It prints "Value: 1"
-st.write("Value:", count1)
+# pyspellchecker chỉ hỗ trợ một số ngôn ngữ
+SPELL_LANGS = {"en", "es", "fr", "pt", "de", "ru", "ar", "eu", "lv", "nl"}
+
+# Ngôn ngữ đích cho App 1
+TARGET_LANGS = {
+    "Tiếng Việt": "vi",
+    "Tiếng Anh": "en",
+    "Tiếng Pháp": "fr",
+    "Tiếng Nhật": "ja",
+    "Tiếng Trung (Giản thể)": "zh-CN",
+    "Tiếng Hàn": "ko",
+    "Tiếng Tây Ban Nha": "es",
+    "Tiếng Đức": "de",
+}
+
+EXAMPLES_T = [
+    "Every morning, I drink a cup of coffee.",
+    "Bonjour, comment allez-vous?",
+    "Xin chào, hôm nay trời đẹp quá.",
+]
+EXAMPLES_S = [
+    "Yesturday, I recieveed a mesage from my freind.",
+    "Definately a great oppurtunity.",
+    "Je voudraiis allerr au marchee.",
+]

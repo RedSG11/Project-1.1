@@ -74,7 +74,7 @@ def fix_typos(text, lang_code):
 def run_translation(text, target_code):
     raw = text.strip()
     if len(raw) < min_input_length:
-        return {"Ok": False, "Error": f'Please type at least {min_input_length} characters'}
+        return {"ok": False, "error": f'Please type at least {min_input_length} characters'}
     source = detect_language(raw)
     if source == target_code:
         return {

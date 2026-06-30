@@ -33,3 +33,8 @@ st.badge("Reviewing", color = "yellow")
 st.markdown(":red-badge[Declined]")
 opts = st.multiselect("Select", ["VN", "EN", "FR", "JP", "KR"])
 lvl = st.select_slider("Select", ["Low", "Medium", "High"])
+if st.button("Say hello")"
+  st.write("Hello")
+else: 
+  st.write("Goodbye")
+st.link_button("Open docs", "https://docs.streamlit.io")
